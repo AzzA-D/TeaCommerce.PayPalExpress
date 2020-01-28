@@ -1,0 +1,23 @@
+@using TeaCommerce.Custom.PayPalExpress
+@using TeaCommerce.Umbraco.Web
+
+@{
+    var order = TC.GetCurrentOrder(Helper.StoreId, true);
+    var currentPaymentMethod = TC.GetCurrentPaymentMethod(Helper.StoreId);
+
+    var submitButton = currentPaymentMethod.PaymentProviderAlias == "PayPalExpress"
+                     ? "<div id='paypal-button-container'></div>"
+                     : "<input type=\"submit\" class=\"button\" value=\"Click to make payment\" />";
+
+    var formstr = TC.GeneratePaymentForm(Helper.StoreId, submitButton);
+    var form = new HtmlString(formstr);
+    <div>@form</div>
+}
+
+@if (currentPaymentMethod.PaymentProviderAlias == "PayPalExpress")
+{
+    <script src="/js/TeaCommerce.PayPalExpress.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        $.PaypalExpress('#paypal-button-container', [@Html.Raw(order.GetPayPalExpressTransactionsAsJsonString())]);
+    </script>
+}
